@@ -7,7 +7,6 @@ import { RolesGuard } from 'src/roles/roles.guard';
 import { RoleD } from 'src/roles/decorators/role.decorator';
 import { Role } from 'src/roles/roles.enum';
 import { Request } from 'express';
-import { get } from 'mongoose';
 
 @Controller('order')
 export class OrderController {
@@ -15,9 +14,10 @@ export class OrderController {
 
   @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto, req: Request) {
+  create(@Body() createOrderDto: CreateOrderDto, @Req() req: Request) {
     return this.orderService.create(createOrderDto, req);
   }
+
   @UseGuards(AuthGuard)
   @Get("my-orders")
   my_orders(@Req() req: Request){

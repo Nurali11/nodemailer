@@ -19,7 +19,7 @@ export class OrderService {
   ){}
   async create(data: CreateOrderDto, req: Request) {
     try {
-      console.log('f', req['user'].id);
+      console.log('f', req);
       const user: any = await this.user.findById(req['user'].id)
       
       const product: any = await this.product.findById(data.productId)
