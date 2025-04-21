@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { MailService } from 'src/mail/mail.service';
@@ -18,36 +18,46 @@ export class UserService {
     private jwt: JwtService
   ) {}
   async register(data: CreateUserDto) {
-    let existingUser = await this.user.findOne({ email: data.email });
-    if (existingUser) {
-      return 'Bu email band';
-    }
-    let existingUser2 = await this.user.findOne({ username: data.username });
-    if (existingUser2) {
-      return 'Bu username band';
-    }
+    console.log("asd");
     
-    let hash = bcrypt.hashSync(data.password, 10);
-
-    let otp = totp.generate(data.email + 'otp')
-    await this.mailer.sendMail(data.email, 'Verify your email', otp)
-
-    let newUser = await this.user.create({
-      username: data.username,
-      password: hash,
-      email: data.email,
-      role: data.role
-    });
-
-    console.log({
-      ...data,
-      password: hash,
-    });
-    
-
-    return {
-      message: 'Otp is sent to your email please verify your email',
-      data: newUser
+    try {
+      if(!(data.role in ['ADMIN', 'USER', 'SUPER-ADMIN'])){
+        throw new BadRequestException({message: "role should ['ADMIN', 'USER', 'SUPER-ADMIN]"})
+        return 
+      }
+      let existingUser = await this.user.findOne({ email: data.email });
+      if (existingUser) {
+        return 'Bu email band';
+      }
+      let existingUser2 = await this.user.findOne({ username: data.username });
+      if (existingUser2) {
+        return 'Bu username band';
+      }
+      
+      let hash = bcrypt.hashSync(data.password, 10);
+  
+      let otp = totp.generate(data.email + 'otp')
+      await this.mailer.sendMail(data.email, 'Verify your email', otp)
+  
+      let newUser = await this.user.create({
+        username: data.username,
+        password: hash,
+        email: data.email,
+        role: data.role
+      });
+  
+      console.log({
+        ...data,
+        password: hash,
+      });
+      
+  
+      return {
+        message: 'Otp is sent to your email please verify your email',
+        data: newUser
+      }
+    } catch (error) {
+      return error.message
     }
   }
 

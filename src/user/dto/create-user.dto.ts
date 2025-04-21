@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString } from "class-validator";
+import { IsIn, IsString } from "class-validator";
 
 export class CreateUserDto {
     @ApiProperty()
@@ -11,8 +11,8 @@ export class CreateUserDto {
     password: string;
 
     @ApiProperty()
-    @IsString()
-    role?: string;
+    @IsIn(['ADMIN', 'USER', 'SUPER-ADMIN'])
+    role: string;
 
     @ApiProperty()
     @IsString()
